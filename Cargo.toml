@@ -1,0 +1,9 @@
+[package]
+name = "pender"
+version = "0.1.0"
+authors = ["Alex Hammel <ahammel87@gmail.com>"]
+description = "A little append-only database"
+readme = "./README.md"
+license = "MIT"
+
+[dependencies]
