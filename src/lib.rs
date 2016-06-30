@@ -1,6 +1,4 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-    }
-}
+extern crate blake2_rfc;
+
+pub mod event;
+mod hash;

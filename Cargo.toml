@@ -7,3 +7,4 @@ readme = "./README.md"
 license = "MIT"
 
 [dependencies]
+blake2-rfc = "=0.2.17"
