@@ -1,5 +1,6 @@
 use std::fmt::{Debug, Formatter, Error};
 use std::fmt::Write;
+use std::hash::{Hash, Hasher};
 
 use blake2_rfc::blake2b::blake2b;
 
@@ -31,6 +32,12 @@ impl PartialEq for Blake2 {
 }
 
 impl Eq for Blake2 { }
+
+impl Hash for Blake2 {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.bytes.hash(state);
+    }
+}
 
 impl Debug for Blake2 {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {

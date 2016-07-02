@@ -15,7 +15,7 @@ use hash::Blake2;
 /// assert_eq!(dad.parent(), Some(grandma.hash()));
 /// assert_eq!(child.parent(), Some(dad.hash()));
 /// ```
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Event<'a> {
     Root { fact: &'a [u8] },
     Node { fact: &'a [u8], parent_hash: Blake2 },
