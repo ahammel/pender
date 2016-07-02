@@ -3,40 +3,42 @@ use std::fmt::Write;
 
 use blake2_rfc::blake2b::blake2b;
 
-pub struct Hash {
+pub struct Blake2 {
     pub bytes: [u8; 64]
 }
 
 /// 64-byte blake2b hash of a byte string
-impl Hash {
-    pub fn new(obj: &[u8]) -> Hash {
-        Hash {  bytes: into_64bytes(blake2b(64, b"a key", obj).as_bytes()) }
+impl Blake2 {
+    pub fn new(obj: &[u8]) -> Blake2 {
+        Blake2 {  bytes: into_64bytes(blake2b(64, b"a key", obj).as_bytes()) }
     }
 }
 
-impl Copy for Hash { }
+impl Copy for Blake2 { }
 
-impl Clone for Hash {
-    fn clone(&self) -> Hash {
+impl Clone for Blake2 {
+    fn clone(&self) -> Blake2 {
         *self
     }
 }
 
-impl PartialEq for Hash {
-    fn eq(&self, other: &Hash) -> bool {
+impl PartialEq for Blake2 {
+    fn eq(&self, other: &Blake2) -> bool {
         self.bytes.iter()
             .zip(other.bytes.iter())
             .all(|(x, y)| x == y)
     }
 }
 
-impl Debug for Hash {
+impl Eq for Blake2 { }
+
+impl Debug for Blake2 {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         let mut hex = String::new();
         for &byte in self.bytes.iter() {
             write!(&mut hex, "{:X}", byte).unwrap();
         }
-        write!(f, "Hash {{ bytes: \"{}\" }}", hex)
+        write!(f, "Blake2 {{ bytes: \"{}\" }}", hex)
     }
 }
 

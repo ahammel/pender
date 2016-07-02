@@ -1,4 +1,4 @@
-use hash::Hash;
+use hash::Blake2;
 
 /// A wrapper that imposes partial ordering on chunks of binary data (here
 /// called "Facts").
@@ -18,7 +18,7 @@ use hash::Hash;
 #[derive(Copy, Clone)]
 pub enum Event<'a> {
     Root { fact: &'a [u8] },
-    Node { fact: &'a [u8], parent_hash: Hash },
+    Node { fact: &'a [u8], parent_hash: Blake2 },
 }
 
 impl<'a> Event<'a> {
@@ -48,22 +48,22 @@ impl<'a> Event<'a> {
     /// In the case of a Node event, the hash is the same as that of the Fact.
     /// For Nodes, the parent's hash is appended to the Fact, and we take the
     /// Blake2 hash of that.
-    pub fn hash(self) -> Hash {
+    pub fn hash(self) -> Blake2 {
         match self {
             Event::Root { fact } => {
-                Hash::new(fact)
+                Blake2::new(fact)
             },
             Event::Node { fact, parent_hash } => {
                 let mut tmp = Vec::new();
                 tmp.extend(fact.iter().cloned());
                 tmp.extend(parent_hash.bytes.iter().cloned());
-                Hash::new(&tmp)
+                Blake2::new(&tmp)
             },
         }
     }
 
     /// Return the hash value of the parent Event, if any.
-    pub fn parent(self) -> Option<Hash> {
+    pub fn parent(self) -> Option<Blake2> {
         match self {
             Event::Root { .. } => None,
             Event::Node { parent_hash, .. } => Some(parent_hash),
