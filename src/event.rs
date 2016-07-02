@@ -15,7 +15,6 @@ use hash::Hash;
 /// assert_eq!(dad.parent(), Some(grandma.hash()));
 /// assert_eq!(child.parent(), Some(dad.hash()));
 /// ```
-///
 #[derive(Copy, Clone)]
 pub enum Event<'a> {
     Root { fact: &'a [u8] },
@@ -46,12 +45,13 @@ impl<'a> Event<'a> {
 
     /// Blake2 hash of an Event.
     ///
-    /// In the case of a Node event, the hash is the same as that of the Fact. For Nodes, the
-    /// parent's hash is appended to the Fact, and we take the Blake2 hash of that.
+    /// In the case of a Node event, the hash is the same as that of the Fact.
+    /// For Nodes, the parent's hash is appended to the Fact, and we take the
+    /// Blake2 hash of that.
     pub fn hash(self) -> Hash {
         match self {
             Event::Root { fact } => {
-                Hash::new(&fact)
+                Hash::new(fact)
             },
             Event::Node { fact, parent_hash } => {
                 let mut tmp = Vec::new();
