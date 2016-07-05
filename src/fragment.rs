@@ -8,9 +8,11 @@ use hash::Blake2;
 /// Contains a set of Events ordered by parent relationships
 /// (see `pender::event::Event`). An empty Fragment has no head.
 ///
+/// # Examples
+///
 /// ```
-/// use pender::fragment::Fragment;
 /// use pender::event::Event;
+/// use pender::fragment::{Chain, Fragment, Link};
 ///
 /// let mut frag = Fragment::new();
 /// assert_eq!(frag.head, None);
@@ -23,6 +25,11 @@ use hash::Blake2;
 /// let new_event = Event::new(b"More stuff happened", Some(root));
 /// frag.append_event(new_event);
 /// assert_eq!(frag.head, Some(new_event));
+///
+/// let mut chain = frag.summarize("my-summary");
+/// assert_eq!(chain.next_event(), Link::Event(new_event));
+/// assert_eq!(chain.next_event(), Link::Event(root));
+/// assert_eq!(chain.next_event(), Link::Terminus(None));
 /// ```
 #[derive(Clone, Debug, Default)]
 pub struct Fragment<'a> {
@@ -42,4 +49,50 @@ impl<'a> Fragment<'a> {
         self.head = Some(event);
         self.events.insert(event.hash(), event);
     }
+
+    pub fn summarize (self, name: &'a str) -> Chain<'a> {
+        Chain::new(self, name)
+    }
+}
+
+#[derive(Debug)]
+pub struct Chain<'a> {
+    fragment: Fragment<'a>,
+    summary: &'a str,
+    next: Option<Blake2>,
+}
+
+impl<'a> Chain<'a> {
+    pub fn new(fragment: Fragment<'a>, summary: &'a str) -> Chain<'a> {
+        let head = fragment.head;
+        Chain {
+            fragment: fragment,
+            summary: summary,
+            next: head.map(|e| e.hash())
+        }
+    }
+
+    pub fn next_event(&mut self) -> Link<'a> {
+        match self.next {
+            None => Link::Terminus(None),
+            Some(hash) => {
+                if let Some(event) = self.fragment.events.get(&hash) {
+                    self.next = event.parent();
+                    Link::Event(*event)
+                } else {
+                    Link::Terminus(Some(hash))
+                }
+            }
+        }
+    }
+
+    fn set_next(&mut self) {
+        // TODO: implement
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Link<'a> {
+    Event(Event<'a>),
+    Terminus(Option<Blake2>),
 }
